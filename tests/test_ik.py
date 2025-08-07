@@ -9,7 +9,10 @@ import pybullet_data
 import time
 
 def main():
-    robot_id, table_id, cube_id = launch_world(gui=True)
+    print("Reached main()", flush=True)
+
+    robot_id, table_id, cube_id = launch_world(gui=True, run_time=5)
+    print("World launched", flush=True)
 
     for _ in range(100):
         p.stepSimulation()
@@ -36,8 +39,8 @@ def main():
         p.stepSimulation()
         time.sleep(1./240.)
 
-    print("Target Position:", target_pos)
-    print("Calculated Joint Positions:", joint_angles)
+    print("Target Position:", target_pos, flush=True)
+    print("Calculated Joint Positions:", joint_angles, flush=True)
 
     for i, j in enumerate(joint_angles):
         p.resetJointState(robot_id, i, j)
@@ -45,8 +48,9 @@ def main():
     ee_state = p.getLinkState(robot_id, end_effector_link_index)
     actual_pos = ee_state[4]
 
-    print("Actual End-Effector Position:", actual_pos)
+    print("Actual End-Effector Position:", actual_pos, flush=True)
 
+    time.sleep(1)
     p.disconnect()
 
 if __name__ == "__main__":
