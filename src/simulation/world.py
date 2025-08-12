@@ -1,5 +1,6 @@
 import pybullet as p
 import pybullet_data
+import random
 import time
 import os
 
@@ -38,6 +39,7 @@ def launch_world(gui=True, run_time=None):
     print(f"Table ID: {table_id}, Cube ID: {cube_id}")
 
     hold_default_pose(kuka_id)
+    add_clutter(num_objects=5, table_id=table_id)
 
     p.setRealTimeSimulation(1)
 
@@ -74,6 +76,25 @@ def hold_default_pose(robot_id):
                 targetPosition=target_positions[joint_index],
                 force=500
             )
+
+def add_clutter(num_objects=5, table_id=None):
+    if table_id is None:
+        raise ValueError("You must pass the table_id so clutter height can be calculated.")
+
+    aabb_min, aabb_max = p.getAABB(table_id)
+    table_top_z = aabb_max[2]
+
+    for _ in range(num_objects):
+        x = random.uniform(0.4, 0.7)
+        y = random.uniform(-0.35, 0.35)
+        z = table_top_z + 0.025
+        obj_path = random.choice([
+            "cube_small.urdf",
+            "sphere_small.urdf",
+            "duck_vhacd.urdf"
+        ])
+        clutter_id = p.loadURDF(obj_path, [x, y, z])
+        p.changeDynamics(clutter_id, -1, mass=0)
 
 if __name__ == "__main__":
     launch_world()
