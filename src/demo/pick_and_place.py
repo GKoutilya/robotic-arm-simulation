@@ -4,6 +4,8 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from src.control.arm_controller import ArmController
 from src.simulation.world import add_clutter
+from src.camera.camera_sim import capture_camera_image
+import src.camera.object_detector
 import pybullet as p
 import pybullet_data
 import time
