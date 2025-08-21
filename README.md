@@ -1,7 +1,7 @@
 # Vision-Guided Robotic Arm Simulation
 
 This project is a **simulation of a robotic arm performing vision-based pick-and-place tasks**.  
-It is designed as a sandbox for experimenting with computer vision, robotics control, and reinforcement learning techniques — without needing real hardware.
+It is designed as a sandbox for experimenting with computer vision, robotics control, and reinforcement learning techniques, without needing real hardware.
 
 ## Features (Current Progress)
 - **Simulation environment** built in [PyBullet](https://pybullet.org/).
@@ -37,6 +37,7 @@ project\_root/
    git clone <repo-url>
    cd vision-guided-robotic-arm
 ````
+```
 
 2. Install dependencies:
 
@@ -48,6 +49,7 @@ project\_root/
    ```bash
    python main.py
    ```
+
 
 ## Future Directions
 
