@@ -43,20 +43,6 @@ def launch_world(gui=True, run_time=None):
 
     p.setRealTimeSimulation(1)
 
-    '''try:
-        print("Running simulation. Press CTRL+C to exit.")
-        if run_time is None:
-            while True:
-                time.sleep(0.01)
-        else:
-            start = time.time()
-            while time.time() - start < run_time:
-                time.sleep(0.01)
-    except KeyboardInterrupt:
-        print("Simulation ended by user.")
-    finally:
-        p.disconnect()'''
-
     return kuka_id, table_id, cube_id
 
 def hold_default_pose(robot_id):
