@@ -36,8 +36,7 @@ project\_root/
    ```bash
    git clone <repo-url>
    cd vision-guided-robotic-arm
-````
-```
+    ```
 
 2. Install dependencies:
 
