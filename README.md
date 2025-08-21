@@ -63,5 +63,3 @@ project\_root/
 
 Currently in **early development phase**. The environment, robot, table, clutter, and cameras are functional.
 Next step: **integrating perception and control for object manipulation.**
-
-```
