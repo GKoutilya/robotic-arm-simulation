@@ -30,10 +30,10 @@ def capture_camera_image():
     img_width = 256
     img_height = 256
     img_arr = p.getCameraImage(
-        width=img_width,
-        height=img_height,
-        viewMatrix=view_matrix,
-        projection_matrix=projection_matrix,
+        img_width,
+        img_height,
+        view_matrix,
+        projection_matrix,
         renderer=p.ER_BULLET_HARDWARE_OPENGL
     )
 

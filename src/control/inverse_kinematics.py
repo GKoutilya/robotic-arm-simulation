@@ -1,7 +1,7 @@
 import pybullet as p
 import numpy as np
 
-def calculate_ik(robot_id, target_pos, target_ori=None, end_effector_index=6):
+def calculate_ik(robot_id, end_effector_index=6, target_pos=None, target_ori=None):
     """
         Computes inverse kinematics to reach the given position (and optional orientation).
 

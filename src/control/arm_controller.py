@@ -1,6 +1,6 @@
 import pybullet as p
 import numpy as np
-from inverse_kinematics import calculate_ik
+from src.control.inverse_kinematics import calculate_ik
 
 class ArmController:
     def __init__(self, robot_id, end_effector_index, joint_indices):
