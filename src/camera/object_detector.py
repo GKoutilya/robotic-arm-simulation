@@ -15,12 +15,12 @@ def detect_objects(rgb_image, target_color=[255, 0, 0], threshold=50):
     """
     rgb = np.array(rgb_image)
 
-    color_diff = np.abs(rgb - target_color)
+    color_diff = np.abs(rgb.astype(np.int16) - np.array(target_color, dtype=np.int16))
     mask = np.all(color_diff < threshold, axis=2)
 
     if np.any(mask):
         y_coords, x_coords = np.where(mask)
-        if len(x_coords) < 0:
+        if len(x_coords) > 0:
             center_x = int(np.mean(x_coords))
             center_y = int(np.mean(y_coords))
             return [(center_x, center_y)]
@@ -48,7 +48,7 @@ def pixel_to_world_coords(pixel_x, pixel_y, depth_value, camera_params=None):
     norm_y = (pixel_y - img_height / 2) / (img_height / 2)
 
     world_x = table_center[0] + norm_x * table_size / 2
-    world_y = table_center[1] + norm_y * table_size / 2
+    world_y = table_center[1] - norm_y * table_size / 2
     world_z = table_center[2] + 0.02
 
     return [world_x, world_y, world_z]
@@ -73,7 +73,6 @@ def find_target_object(target_color=[255, 0, 0], threshold=50):
     if detected_objects:
         pixel_x, pixel_y = detected_objects[0]
         depth_value = depth_img[pixel_y, pixel_x]
-
         world_pos = pixel_to_world_coords(pixel_x, pixel_y, depth_value)
 
         print(f"[INFO] Detected object at pixel ({pixel_x}, {pixel_y})")

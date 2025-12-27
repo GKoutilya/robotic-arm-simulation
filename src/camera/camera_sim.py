@@ -4,20 +4,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 import time
 
-def capture_camera_image():
-    cam_target_pos = [0.6, 0, 0.35]
-    cam_distance = 1.0
-    cam_yaw = 90
-    cam_pitch = -90
-    cam_roll = 0
-    up_vector = [0, 1, 0]
-
+def capture_camera_image(target_pos=[0.6, 0, 0.35], distance=1.0, yaw=90, pitch=-45):
+    """
+    Capture RGB and depth images from a simulated camera.
+    """
     view_matrix = p.computeViewMatrixFromYawPitchRoll(
-        cameraTargetPosition=cam_target_pos,
-        distance=cam_distance,
-        yaw=cam_yaw,
-        pitch=cam_pitch,
-        roll=cam_roll,
+        cameraTargetPosition=target_pos,
+        distance=distance,
+        yaw=yaw,
+        pitch=pitch,
+        roll=0,
         upAxisIndex=2
     )
 
@@ -30,10 +26,10 @@ def capture_camera_image():
     img_width = 256
     img_height = 256
     img_arr = p.getCameraImage(
-        img_width,
-        img_height,
-        view_matrix,
-        projection_matrix,
+        width=img_width,
+        height=img_height,
+        viewMatrix=view_matrix,
+        projectionMatrix=projection_matrix,
         renderer=p.ER_BULLET_HARDWARE_OPENGL
     )
 
@@ -41,7 +37,7 @@ def capture_camera_image():
     depth = np.reshape(img_arr[3], (img_height, img_width))
 
     depth_real = far * near / (far - (far - near) * depth)
-    rgb_uint8 = (rgb[:, :, :3] * 255).astype('uint8')
+    rgb_uint8 = rgb[:, :, :3].astype(np.uint8)
 
     return rgb_uint8, depth_real
 
