@@ -25,11 +25,11 @@ This project demonstrates core robotics concepts including inverse kinematics, m
 ## Demo Sequence
 
 ```
-1. 🟡 Detect yellow obstacle at target location
-2. 🤖 Pick up and move obstacle aside
-3. 🔴 Pick up red cube from starting position
-4. 📍 Place red cube at cleared target location
-5. 🏠 Return robot to home position
+1. Detect yellow obstacle at target location
+2. Pick up and move obstacle aside
+3. Pick up red cube from starting position
+4. Place red cube at cleared target location
+5. Return robot to home position
 ```
 
 ## Installation
@@ -200,8 +200,6 @@ MIT License - feel free to use this project for learning and portfolio purposes.
 
 ## Author
 
-Built as a robotics portfolio project demonstrating:
-- Physics simulation with PyBullet
-- Computer vision for object detection
-- Motion planning and inverse kinematics
-- Autonomous decision-making (obstacle avoidance)
+- **Name**: Koutilya Ganapathiraju
+- **Email**: gkoutilyaraju@gmail.com
+- **LinkedIn**: www.linkedin.com/in/koutilya-ganapathiraju-0a3350182
