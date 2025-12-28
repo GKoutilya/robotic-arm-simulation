@@ -189,7 +189,7 @@ MIT License — free to use for learning, research, and portfolio purposes.
 ## Author
 
 **Koutilya Ganapathiraju**
-Email: [gkoutilyaraju@gmail.com](mailto:gkoutilyaraju@gmail.com)
-LinkedIn: [https://www.linkedin.com/in/koutilya-ganapathiraju-0a3350182](https://www.linkedin.com/in/koutilya-ganapathiraju-0a3350182)
+- **Email**: [gkoutilyaraju@gmail.com](mailto:gkoutilyaraju@gmail.com)
+- **LinkedIn**: [https://www.linkedin.com/in/koutilya-ganapathiraju-0a3350182](https://www.linkedin.com/in/koutilya-ganapathiraju-0a3350182)
 
 ---
