@@ -1,94 +1,119 @@
 # Simulated Robotic Arm with Vision-Guided Object Manipulation
 
-A PyBullet-based simulation of a KUKA IIWA robotic arm performing vision-guided pick-and-place operations with intelligent obstacle avoidance.
+A complete physics-based simulation of a 7-DOF robotic arm performing autonomous, vision-guided pick-and-place in a cluttered tabletop environment using a modular perception–planning–control pipeline.
 
 ![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
 ![PyBullet](https://img.shields.io/badge/PyBullet-Physics-green.svg)
-![OpenCV](https://img.shields.io/badge/OpenCV-Vision-red.svg)
+![Computer Vision](https://img.shields.io/badge/Vision-RGB--D-red.svg)
+
+---
 
 ## Overview
 
-This project demonstrates core robotics concepts including inverse kinematics, motion planning, computer vision, and autonomous decision-making. The robot arm can detect objects using color-based vision, clear obstacles blocking target locations, and perform precise pick-and-place operations.
+This project implements an end-to-end robotic manipulation system in simulation. A robotic arm observes a cluttered tabletop scene using simulated RGB, depth, and segmentation cameras, detects a target object using vision, reasons about workspace clutter, and executes a smooth pick-and-place operation using inverse kinematics and physics-aware motion primitives.
 
-## Key Features
+The system mirrors the structure of real robotic manipulation stacks used in industry, with a clean separation between **perception**, **planning**, and **control**, making it both technically rigorous and interview-defensible.
 
-| Feature | Description |
-|---------|-------------|
-| **Vision System** | Camera-based object detection using color segmentation |
-| **Inverse Kinematics** | Real-time IK solver for 7-DOF robot arm |
-| **Obstacle Clearing** | Automatically detects and relocates obstacles blocking target positions |
-| **Smooth Motion** | Interpolated trajectories with ease-in-out curves |
-| **Gentle Placement** | Objects are lowered carefully to prevent bouncing |
-| **Multiple Modes** | Single object, multi-object, and color sorting demos |
-| **Home Position** | Robot returns to starting pose after task completion |
+---
 
-## Demo Sequence
+## System Architecture
+
+The pipeline follows a standard robotics control loop:
+
+### Perception
+
+* Simulated RGB, depth, and segmentation cameras
+* Color-based object detection
+* Projection from image space to world coordinates
+
+### Planning
+
+* Task-level sequencing (approach → grasp → lift → place → retreat)
+* Rule-based clutter handling when the target location is obstructed
+* Height-aware motion strategies to avoid collisions without full motion planning
+
+### Control
+
+* Inverse kinematics using PyBullet’s damped least-squares solver
+* Smooth joint-space trajectory interpolation
+* Position-controlled execution with bounded forces
+
+Each component is modular and independently replaceable, reflecting real robotic system design.
+
+---
+
+## Key Capabilities
+
+| Capability                     | Description                                                           |
+| ------------------------------ | --------------------------------------------------------------------- |
+| **Vision-Guided Manipulation** | Uses RGB, depth, and segmentation cameras for object localization     |
+| **Inverse Kinematics Control** | Real-time IK for a 7-DOF articulated arm                              |
+| **Clutter-Aware Execution**    | Detects and relocates blocking objects when necessary                 |
+| **Stable Physics Interaction** | Fixed table, stable clutter placement, and controlled object dynamics |
+| **Smooth Motion Execution**    | Interpolated joint trajectories for natural arm motion                |
+| **Modular Architecture**       | Clean separation of perception, planning, and control logic           |
+
+---
+
+## Demonstrated Behavior
+
+A full task execution proceeds as follows:
 
 ```
-1. Detect yellow obstacle at target location
-2. Pick up and move obstacle aside
-3. Pick up red cube from starting position
-4. Place red cube at cleared target location
-5. Return robot to home position
+1. Capture RGB, depth, and segmentation images
+2. Detect target object in the scene
+3. Estimate target position in world coordinates
+4. Check for clutter blocking the target location
+5. Relocate blocking objects if present
+6. Pick up the target object
+7. Place the object at the goal position
+8. Return the robot to a home configuration
 ```
+
+All actions are executed under physics simulation with gravity, contact dynamics, and joint constraints enabled.
+
+---
 
 ## Installation
 
 ### Prerequisites
-- Python 3.8 or higher
-- pip package manager
+
+* Python 3.8 or newer
+* pip
 
 ### Setup
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/robotic-arm-simulation.git
-cd robotic-arm-simulation
 
-# Install dependencies
+```bash
+git clone https://github.com/yourusername/simulated-robotic-arm.git
+cd simulated-robotic-arm
 pip install -r requirements.txt
 ```
 
 ### Dependencies
-- `pybullet` - Physics simulation engine
-- `numpy` - Numerical computations
-- `opencv-python` - Computer vision and image processing
 
-## Usage
+* `pybullet`
+* `numpy`
+* `opencv-python`
+* `matplotlib`
 
-### Basic Demo (with obstacle clearing)
+---
+
+## Running the Simulation
+
+Launch the complete vision-guided pick-and-place pipeline:
+
 ```bash
-python src/demo/pick_and_place.py
+python -m src.demo.pick_and_place
 ```
 
-### Without Obstacle
-```bash
-python src/demo/pick_and_place.py --no-obstacle
-```
+This opens a PyBullet GUI window showing:
 
-### Multi-Object Mode
-```bash
-python src/demo/pick_and_place.py --mode multi
-```
+* The robotic arm
+* A fixed tabletop environment
+* Randomly placed clutter objects
+* Autonomous manipulation behavior driven by vision
 
-### Color Sorting Mode
-```bash
-python src/demo/pick_and_place.py --mode sort
-```
-
-### Custom Target Location
-```bash
-python src/demo/pick_and_place.py --place-x 0.4 --place-y 0.15
-```
-
-### Command-Line Arguments
-
-| Argument | Description | Default |
-|----------|-------------|---------|
-| `--mode` | Demo mode: `single`, `multi`, or `sort` | `single` |
-| `--no-obstacle` | Run without obstacle at target | `False` |
-| `--no-clutter` | Disable random clutter objects | `False` |
-| `--place-x` | X coordinate for target position | `0.5` |
-| `--place-y` | Y coordinate for target position | `0.0` |
+---
 
 ## Project Structure
 
@@ -96,105 +121,75 @@ python src/demo/pick_and_place.py --place-x 0.4 --place-y 0.15
 📁 Simulated Robotic Arm with Vision-Guided Object Manipulation/
 ├── 📁 assets/
 │   ├── 📁 objects/
-│   │   └── cube.urdf              # Cube object model
-│   └── 📁 table/
-│       └── table.urdf             # Table model
+│   │   └── cube.urdf
+│   ├── 📁 table/
+│   │   └── table.urdf
+│   └── ur5e.urdf
 ├── 📁 src/
 │   ├── 📁 camera/
-│   │   ├── camera_sim.py          # Simulated RGB-D camera
-│   │   └── object_detector.py     # Color-based object detection
+│   │   ├── camera_sim.py          # RGB / depth / segmentation cameras
+│   │   └── object_detector.py     # Vision-based object detection
 │   ├── 📁 control/
-│   │   ├── arm_controller.py      # Robot arm control interface
-│   │   ├── inverse_kinematics.py  # IK solver using PyBullet
-│   │   └── planner.py             # Trajectory planning utilities
-│   ├── 📁 demo/
-│   │   └── pick_and_place.py      # Main demonstration script ⭐
-│   └── 📁 simulation/
-│       ├── world.py               # Scene and environment setup
-│       └── utils.py               # Helper functions
-├── 📁 tests/
-│   └── test_ik.py                 # Inverse kinematics tests
+│   │   ├── arm_controller.py      # High-level arm control interface
+│   │   └── inverse_kinematics.py  # Inverse kinematics solver
+│   ├── 📁 simulation/
+│   │   └── world.py               # Physics world and scene setup
+│   └── 📁 demo/
+│       └── pick_and_place.py      # Main executable pipeline ⭐
 ├── requirements.txt
 └── README.md
 ```
 
-## Technical Details
+---
+
+## Technical Specifications
 
 ### Robot
-- **Model**: KUKA IIWA 7-DOF robotic arm
-- **End Effector**: Simulated suction gripper (constraint-based grasping)
-- **Control**: Position control with 500N force limit
+
+* **Type**: 7-DOF articulated robotic arm
+* **Control Mode**: Joint position control
+* **End Effector**: Constraint-based grasping
 
 ### Vision System
-- **Camera**: Simulated RGB-D camera mounted above workspace
-- **Detection**: HSV color space thresholding
-- **Supported Colors**: Red, Green, Blue, Yellow
 
-### Motion Planning
-- **IK Solver**: PyBullet's built-in damped least squares solver
-- **Trajectory**: Linear interpolation with smooth ease-in-out curves
-- **Collision Avoidance**: Height-based approach and retreat paths
+* **Sensors**: Simulated RGB, depth, and segmentation cameras
+* **Detection Method**: Color-based segmentation
+* **Output**: Object positions in world coordinates
+
+### Motion Generation
+
+* **IK Solver**: PyBullet damped least-squares
+* **Trajectory Generation**: Linear interpolation in joint space
+* **Collision Strategy**: Height-based approach and retreat motions
 
 ### Coordinate System
-- **Origin**: Robot base
-- **X-axis**: Forward (toward table)
-- **Y-axis**: Left
-- **Z-axis**: Up
 
-## Controls
+* **Origin**: Robot base frame
+* **X-axis**: Forward (toward table)
+* **Y-axis**: Left
+* **Z-axis**: Up
 
-- **Mouse**: Rotate and zoom the 3D view
-- **CTRL+C**: Exit simulation
+---
 
-## Sample Output
+## Design Rationale
 
-```
-VISION-GUIDED PICK-AND-PLACE WITH OBSTACLE CLEARING
+* PyBullet was chosen for rapid prototyping with realistic physics
+* Rule-based planning ensures interpretability and deterministic behavior
+* Height-based motion primitives avoid the need for full global path planning
+* Modular structure mirrors real robotic software stacks used in production systems
 
-   [INFO] Mode: single
-   [INFO] Target place position: [0.5, 0.0, 0.65]
-   [INFO] Obstacle at target: True
-
-PHASE 1: CLEAR OBSTACLE IF BLOCKING
-
-   [ALERT] OBSTACLE IS BLOCKING TARGET POSITION!
-   [ACTION] MOVING OBSTACLE (ID: 4) OUT OF THE WAY
-   [SUCCESS] Obstacle moved!
-
-PHASE 2: PICK UP RED CUBE
-
-   [ACTION] PICKING UP OBJECT (ID: 3)
-   [SUCCESS] Object picked up!
-
-PHASE 3: PLACE RED CUBE AT TARGET
-
-   [ACTION] PLACING OBJECT AT TARGET
-   [SUCCESS] Object placed!
-
-PHASE 4: RETURN TO HOME POSITION
-
-   [SUCCESS] Robot returned to home position!
-
-
-[SUCCESS] TASK COMPLETE!
-
-```
-
-## Future Improvements
-
-- [ ] Add ROS/ROS2 integration for real robot deployment
-- [ ] Implement path planning with RRT/RRT*
-- [ ] Add reinforcement learning for adaptive grasping
-- [ ] Support more complex object shapes (cylinders, irregular objects)
-- [ ] Implement force/torque feedback for sensitive manipulation
-- [ ] Add multi-robot coordination
+---
 
 ## License
 
-MIT License - feel free to use this project for learning and portfolio purposes.
+MIT License — free to use for learning, research, and portfolio purposes.
+
+---
 
 ## Author
 
-- **Name**: Koutilya Ganapathiraju
-- **Email**: gkoutilyaraju@gmail.com
-- **LinkedIn**: www.linkedin.com/in/koutilya-ganapathiraju-0a3350182
+**Koutilya Ganapathiraju**
+Email: [gkoutilyaraju@gmail.com](mailto:gkoutilyaraju@gmail.com)
+LinkedIn: [https://www.linkedin.com/in/koutilya-ganapathiraju-0a3350182](https://www.linkedin.com/in/koutilya-ganapathiraju-0a3350182)
+
+---
