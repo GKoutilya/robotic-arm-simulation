@@ -149,40 +149,35 @@ python src/demo/pick_and_place.py --place-x 0.4 --place-y 0.15
 ## Sample Output
 
 ```
-**********************************************************************
-  VISION-GUIDED PICK-AND-PLACE WITH OBSTACLE CLEARING
-**********************************************************************
-[INFO] Mode: single
-[INFO] Target place position: [0.5, 0.0, 0.65]
-[INFO] Obstacle at target: True
+VISION-GUIDED PICK-AND-PLACE WITH OBSTACLE CLEARING
 
-======================================================================
+   [INFO] Mode: single
+   [INFO] Target place position: [0.5, 0.0, 0.65]
+   [INFO] Obstacle at target: True
+
 PHASE 1: CLEAR OBSTACLE IF BLOCKING
-======================================================================
-[ALERT] OBSTACLE IS BLOCKING TARGET POSITION!
-[ACTION] MOVING OBSTACLE (ID: 4) OUT OF THE WAY
-[SUCCESS] Obstacle moved!
 
-======================================================================
+   [ALERT] OBSTACLE IS BLOCKING TARGET POSITION!
+   [ACTION] MOVING OBSTACLE (ID: 4) OUT OF THE WAY
+   [SUCCESS] Obstacle moved!
+
 PHASE 2: PICK UP RED CUBE
-======================================================================
-[ACTION] PICKING UP OBJECT (ID: 3)
-[SUCCESS] Object picked up!
 
-======================================================================
+   [ACTION] PICKING UP OBJECT (ID: 3)
+   [SUCCESS] Object picked up!
+
 PHASE 3: PLACE RED CUBE AT TARGET
-======================================================================
-[ACTION] PLACING OBJECT AT TARGET
-[SUCCESS] Object placed!
 
-======================================================================
+   [ACTION] PLACING OBJECT AT TARGET
+   [SUCCESS] Object placed!
+
 PHASE 4: RETURN TO HOME POSITION
-======================================================================
-[SUCCESS] Robot returned to home position!
 
-######################################################################
+   [SUCCESS] Robot returned to home position!
+
+
 [SUCCESS] TASK COMPLETE!
-######################################################################
+
 ```
 
 ## Future Improvements
