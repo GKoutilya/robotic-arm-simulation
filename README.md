@@ -12,7 +12,7 @@ A complete physics-based simulation of a 7-DOF robotic arm performing autonomous
 
 This project implements an end-to-end robotic manipulation system in simulation. A robotic arm observes a tabletop scene using a simulated RGB-D camera, localizes a target object with a segmentation-mask-based perception pipeline and true pinhole-camera unprojection, reasons about workspace clutter, and executes a smooth pick-and-place operation using inverse kinematics and physics-aware motion primitives.
 
-The system separates **perception**, **planning**, and **control** into independent modules, mirroring the structure of real robotic manipulation stacks. That separation is not just conceptual: the same logic also runs as an actual multi-node **ROS2** computation graph (see [ROS2 Integration](#ros2-integration)), communicating over real topics/services/actions instead of in-process function calls — the standalone script below still works on its own and doesn't require ROS2 at all.
+The system separates **perception**, **planning**, and **control** into independent modules, mirroring the structure of real robotic manipulation stacks. That separation is not just conceptual: the same logic also runs as an actual multi-node **ROS2** computation graph (see [ROS2 Integration](#ros2-integration)), communicating over real topics/services/actions instead of in-process function calls, the standalone script below still works on its own and doesn't require ROS2 at all.
 
 ---
 
@@ -23,7 +23,7 @@ The pipeline follows a standard robotics control loop:
 ### Perception
 
 * Simulated RGB-D camera with a real pinhole camera model (explicit intrinsics from FOV/aspect/resolution, extrinsics from the camera's view matrix)
-* Per-object localization via PyBullet's segmentation mask (a stand-in for a trained instance-segmentation network) rather than flat color-threshold pixel search — this avoids the color-bleed/ambiguity issues a naive color mask has with multiple similarly-colored objects
+* Per-object localization via PyBullet's segmentation mask (a stand-in for a trained instance-segmentation network) rather than flat color-threshold pixel search, this avoids the color-bleed/ambiguity issues a naive color mask has with multiple similarly-colored objects
 * Color classification of each detected object from its own RGB pixels
 * True depth-based pixel → world unprojection (inverse of projection × view, not an assumed flat table plane)
 * Closed-loop re-detection during final alignment (the arm re-runs vision each iteration while homing in on the object, not just once)
@@ -31,8 +31,8 @@ The pipeline follows a standard robotics control loop:
 ### Planning
 
 * Task-level sequencing (approach → grasp → lift → place → retreat)
-* `single`/`multi`/`sort` modes: rule-based clutter handling — a scripted distance check that relocates a single known blocking object, plus height-aware approach/retreat motions
-* `clutter` mode: genuine collision-aware path planning — a goal-biased RRT ([`src/control/motion_planner.py`](src/control/motion_planner.py)) plans a 3D route around every vision-detected object standing between the arm and its target, with path shortcutting for smoother motion, falling back to physically relocating the nearest blocking object only if no path can be found
+* `single`/`multi`/`sort` modes: rule-based clutter handling, a scripted distance check that relocates a single known blocking object, plus height-aware approach/retreat motions
+* `clutter` mode: genuine collision-aware path planning, a goal-biased RRT ([`src/control/motion_planner.py`](src/control/motion_planner.py)) plans a 3D route around every vision-detected object standing between the arm and its target, with path shortcutting for smoother motion, falling back to physically relocating the nearest blocking object only if no path can be found
 
 ### Control
 
@@ -42,7 +42,7 @@ The pipeline follows a standard robotics control loop:
 
 Each component is modular and independently replaceable, reflecting real robotic system design. All camera, robot, and threshold constants live in one place ([`src/config.py`](src/config.py)) rather than being duplicated across modules.
 
-**What's still ground truth, and why:** the physical grasp (the PyBullet constraint that attaches an object to the end-effector) and obstacle clearing both use PyBullet's simulation state directly. Vision drives *where to go and what to pick*; physics and a simple distance check handle *making and confirming contact* and *is something in the way*, respectively — the same division of labor a real stack has between a perception module and low-level force/contact sensing.
+**What's still ground truth, and why:** the physical grasp (the PyBullet constraint that attaches an object to the end-effector) and obstacle clearing both use PyBullet's simulation state directly. Vision drives *where to go and what to pick*; physics and a simple distance check handle *making and confirming contact* and *is something in the way*, respectively. It's the same division of labor a real stack has between a perception module and low-level force/contact sensing.
 
 ---
 
@@ -156,7 +156,7 @@ The suite covers the pure-math planning/detection logic plus headless (`p.DIRECT
 
 ## ROS2 Integration
 
-The perception/planning/control separation described above also exists as a real **ROS2 Jazzy** node graph — not a toy demo, an actual multi-process system where each node is a thin wrapper around the *same* functions the standalone script uses (`load_scene`, `calculate_ik`, `plan_path`/`shortcut_path`, `find_objects_by_segmentation`, `attach_object_to_ee`). This is additive: `python -m src.demo.pick_and_place` still works completely on its own and needs none of this.
+The perception/planning/control separation described above also exists as a real **ROS2 Jazzy** node graph, not a toy demo, an actual multi-process system where each node is a thin wrapper around the *same* functions the standalone script uses (`load_scene`, `calculate_ik`, `plan_path`/`shortcut_path`, `find_objects_by_segmentation`, `attach_object_to_ee`). This is additive: `python -m src.demo.pick_and_place` still works completely on its own and needs none of this.
 
 ### Node graph
 
@@ -167,7 +167,7 @@ The perception/planning/control separation described above also exists as a real
 | `planner_node` | Serves `/plan_path`; runs IK + the RRT planner against its own "kinematic twin" PyBullet instance (the same planning/execution-model separation MoveIt2 uses) | `calculate_ik`, `motion_planner.plan_path`/`shortcut_path` |
 | `task_node` | Orchestrates a full pick-and-place as a `/pick_and_place` action (goal/feedback/result): detect → approach → descend → grasp → transport → lower → release | New code — re-expresses `run_single_mode`'s sequence as async service/action calls |
 
-Custom interfaces (`arm_interfaces` package) are kept to the minimum that doesn't already have a good standard ROS type: `CameraFrame.msg` (RGB + raw depth buffer + PyBullet segmentation buffer — segmentation has no real-camera analogue), `PlanPath.srv`, `Grasp.srv`, and the top-level `PickAndPlace.action`. Everything else reuses standard types: `sensor_msgs/JointState`, `sensor_msgs/Image`, `vision_msgs/Detection3DArray`, `trajectory_msgs/JointTrajectory`, `std_srvs/Trigger`, and `control_msgs/action/FollowJointTrajectory` (the same action `ros2_control`/MoveIt2 use for trajectory execution).
+Custom interfaces (`arm_interfaces` package) are kept to the minimum that doesn't already have a good standard ROS type: `CameraFrame.msg` (RGB + raw depth buffer + PyBullet segmentation buffer, segmentation has no real-camera analogue), `PlanPath.srv`, `Grasp.srv`, and the top-level `PickAndPlace.action`. Everything else reuses standard types: `sensor_msgs/JointState`, `sensor_msgs/Image`, `vision_msgs/Detection3DArray`, `trajectory_msgs/JointTrajectory`, `std_srvs/Trigger`, and `control_msgs/action/FollowJointTrajectory` (the same action `ros2_control`/MoveIt2 use for trajectory execution).
 
 **Current scope:** `task_node` handles single-object pick-and-place by target color (matching `single` mode's complexity). Porting `clutter` mode's obstacle-relocation fallback and closed-loop re-alignment into the ROS2 orchestration is a reasonable follow-up, not done yet.
 
@@ -291,10 +291,10 @@ Open RViz2 (`rviz2 -d ros2_ws/src/arm_ros2/rviz/arm.rviz`, from a location where
 * PyBullet was chosen for rapid prototyping with realistic physics
 * Segmentation-based detection avoids the multi-object ambiguity of flat color thresholding, while staying simple enough to reason about and test
 * `single`/`multi`/`sort` modes use rule-based planning for interpretability and deterministic behavior
-* `clutter` mode's RRT plans in 3D task space over inflated bounding-sphere obstacles rather than full 7-DOF joint-space planning with per-node collision queries — collision-aware and adaptive to a randomized scene each run, without the cost/fragility of the full-arm version, and pure geometry means it's fast, deterministic-when-seeded, and unit-testable without PyBullet
+* `clutter` mode's RRT plans in 3D task space over inflated bounding-sphere obstacles rather than full 7-DOF joint-space planning with per-node collision queries, collision-aware and adaptive to a randomized scene each run, without the cost/fragility of the full-arm version, and pure geometry means it's fast, deterministic-when-seeded, and unit-testable without PyBullet
 * Modular structure mirrors real robotic software stacks used in production systems — closely enough that the same logic runs unmodified as ROS2 nodes (see [ROS2 Integration](#ros2-integration)), each one a thin wrapper reusing the existing functions rather than a reimplementation
 * `planner_node` runs IK/planning against its own separate "kinematic twin" PyBullet instance rather than the live simulated robot, mirroring the planning-model/execution-model separation real systems like MoveIt2 use
-* ROS2 interfaces reuse standard message/service/action types wherever one genuinely fits (`sensor_msgs`, `vision_msgs/Detection3DArray`, `control_msgs/action/FollowJointTrajectory`), with custom types defined only where nothing standard covers the concept (e.g. `CameraFrame.msg`, which carries PyBullet's segmentation buffer — a sim-only privilege with no real-camera equivalent)
+* ROS2 interfaces reuse standard message/service/action types wherever one genuinely fits (`sensor_msgs`, `vision_msgs/Detection3DArray`, `control_msgs/action/FollowJointTrajectory`), with custom types defined only where nothing standard covers the concept (e.g. `CameraFrame.msg`, which carries PyBullet's segmentation buffer, a sim-only privilege with no real-camera equivalent)
 
 ---
 
