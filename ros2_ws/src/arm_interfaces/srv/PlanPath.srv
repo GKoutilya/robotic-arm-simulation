@@ -1,0 +1,7 @@
+geometry_msgs/Pose goal
+geometry_msgs/Point[] obstacle_positions
+float64[] obstacle_radii
+---
+trajectory_msgs/JointTrajectory trajectory
+bool success
+string message

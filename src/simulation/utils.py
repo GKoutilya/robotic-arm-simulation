@@ -2,6 +2,9 @@ import pybullet as p
 import numpy as np
 import time
 
+from src.config import COLORS_RGBA
+
+
 def create_colored_cube(position, color_rgba, size=0.05):
     """
     Create a colored cube at the specified position.
@@ -40,11 +43,11 @@ def create_sorting_bins(base_position, num_bins=3, bin_spacing=0.15):
     """
     bin_positions = []
     colors = [
-        [1, 0, 0, 0.3],  # Red (transparent)
-        [0, 1, 0, 0.3],  # Green
-        [0, 0, 1, 0.3],  # Blue
+        COLORS_RGBA["red"][:3] + [0.3],
+        COLORS_RGBA["green"][:3] + [0.3],
+        COLORS_RGBA["blue"][:3] + [0.3],
     ]
-    
+
     for i in range(num_bins):
         pos = [
             base_position[0],

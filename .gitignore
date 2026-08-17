@@ -3,3 +3,11 @@ __pycache__/
 *.pyc
 *.log
 .DS_Store
+*.egg-info/
+
+# colcon build artifacts -- the real build happens outside this repo (see
+# ros2_ws/sync_and_build.sh), but ignore these defensively in case colcon
+# is ever run directly against ros2_ws/ here.
+ros2_ws/build/
+ros2_ws/install/
+ros2_ws/log/

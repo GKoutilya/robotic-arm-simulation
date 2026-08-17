@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vision-guided-arm-sim"
+version = "0.1.0"
+description = "Vision-guided robotic arm pick-and-place simulation (PyBullet)"
+requires-python = ">=3.8"
+dependencies = [
+    "pybullet",
+    "numpy",
+    "matplotlib",
+]
+
+[tool.setuptools.packages.find]
+include = ["src*"]

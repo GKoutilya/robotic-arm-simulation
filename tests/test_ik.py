@@ -1,57 +1,51 @@
-import sys
-import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-from src.simulation.world import launch_world
-from src.control.inverse_kinematics import calculate_ik
+import numpy as np
 import pybullet as p
 import pybullet_data
-import time
+import pytest
 
-def main():
-    print("Reached main()", flush=True)
+from src.control.inverse_kinematics import calculate_ik
+from src.config import EE_LINK
 
-    robot_id, table_id, cube_id = launch_world(gui=True, run_time=5)
-    print("World launched", flush=True)
 
-    for _ in range(100):
-        p.stepSimulation()
-        time.sleep(1./240.)
-    
-    cube_pos, _ = p.getBasePositionAndOrientation(cube_id)
-    target_pos = [cube_pos[0], cube_pos[1], cube_pos[2] + 0.1]
-    target_ori = p.getQuaternionFromEuler([0, -3.14, 0])
+@pytest.fixture
+def robot_id():
+    """Headless PyBullet connection with the KUKA IIWA loaded, torn down after the test."""
+    client = p.connect(p.DIRECT)
+    p.setAdditionalSearchPath(pybullet_data.getDataPath())
+    p.setGravity(0, 0, -9.81)
+    p.loadURDF("plane.urdf")
+    rid = p.loadURDF("kuka_iiwa/model.urdf", basePosition=[0, 0, 0], useFixedBase=True)
+    yield rid
+    p.disconnect(client)
 
-    end_effector_link_index = 6
-    joint_angles = calculate_ik(robot_id, target_pos, target_ori, end_effector_index=end_effector_link_index)
 
-    num_joints = p.getNumJoints(robot_id)
-    for i in range(num_joints):
-        p.setJointMotorControl2(
-            bodyIndex=robot_id,
-            jointIndex=i,
-            controlMode=p.POSITION_CONTROL,
-            targetPosition=joint_angles[i],
-            force=500
-        )
+def test_ee_link_index_is_valid_for_the_loaded_robot(robot_id):
+    assert 0 <= EE_LINK < p.getNumJoints(robot_id)
 
-    for _ in range(1000):
-        p.stepSimulation()
-        time.sleep(1./240.)
 
-    print("Target Position:", target_pos, flush=True)
-    print("Calculated Joint Positions:", joint_angles, flush=True)
+def test_calculate_ik_returns_a_joint_angle_per_joint(robot_id):
+    target_pos = [0.5, 0.0, 0.5]
+    joint_angles = calculate_ik(robot_id, target_pos, end_effector_index=EE_LINK)
 
-    for i, j in enumerate(joint_angles):
-        p.resetJointState(robot_id, i, j)
+    assert joint_angles is not None
+    assert len(joint_angles) == p.getNumJoints(robot_id)
 
-    ee_state = p.getLinkState(robot_id, end_effector_link_index)
-    actual_pos = ee_state[4]
 
-    print("Actual End-Effector Position:", actual_pos, flush=True)
+def test_calculate_ik_solution_reaches_target_within_tolerance(robot_id):
+    target_pos = [0.5, 0.0, 0.5]
+    target_orn = p.getQuaternionFromEuler([np.pi, 0, 0])
 
-    time.sleep(1)
-    p.disconnect()
+    joint_angles = calculate_ik(robot_id, target_pos, target_orn, end_effector_index=EE_LINK)
+    assert joint_angles is not None
 
-if __name__ == "__main__":
-    main()
+    for i, angle in enumerate(joint_angles):
+        p.resetJointState(robot_id, i, angle)
+
+    ee_state = p.getLinkState(robot_id, EE_LINK)
+    actual_pos = np.array(ee_state[4])
+
+    assert np.linalg.norm(actual_pos - np.array(target_pos)) < 0.02
+
+
+def test_calculate_ik_returns_none_for_invalid_target_pos(robot_id):
+    assert calculate_ik(robot_id, None, end_effector_index=EE_LINK) is None

@@ -1,0 +1,9 @@
+string mode
+string target_color
+---
+bool success
+string message
+geometry_msgs/Point final_position
+---
+string phase
+float32 progress
