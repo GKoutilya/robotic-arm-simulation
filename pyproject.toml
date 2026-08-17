@@ -15,3 +15,10 @@ dependencies = [
 
 [tool.setuptools.packages.find]
 include = ["src*"]
+
+[tool.pytest.ini_options]
+# Restrict discovery to the plain-Python suite. ros2_ws/ is a separate ROS2
+# workspace (see README's "ROS2 Integration" section) -- its test module
+# imports launch/launch_ros/launch_testing, which only exist inside a ROS2
+# install (colcon test runs it there, not this repo's plain `pytest`/CI).
+testpaths = ["tests"]
